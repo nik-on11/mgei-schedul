@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/webhook",
+      "destination": "/bot.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
+    }
+  ]
+}
