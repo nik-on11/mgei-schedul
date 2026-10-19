@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="amber">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Расписание МГЭИ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root[data-theme=amber]{--bg:#120d08;--card:rgba(29, 21, 14, 0.62);--accent:#f59e0b;--accent2:#34d399;--text:#fff8f0;--hint:#a18a78;--border:rgba(245,158,11,.2);--soft:rgba(245,158,11,.15);--soft2:rgba(52,211,153,.15)}
+:root[data-theme=emerald]{--bg:#091712;--card:rgba(16, 36, 29, 0.62);--accent:#10b981;--accent2:#fbbf24;--text:#ecfdf5;--hint:#7fc4a4;--border:rgba(16,185,129,.2);--soft:rgba(16,185,129,.15);--soft2:rgba(251,191,36,.15)}
+:root[data-theme=ocean]{--bg:#0b1329;--card:rgba(19, 31, 61, 0.62);--accent:#38bdf8;--accent2:#60a5fa;--text:#eff6ff;--hint:#8fb4e6;--border:rgba(59,130,246,.22);--soft:rgba(56,189,248,.15);--soft2:rgba(96,165,250,.15)}
+:root[data-theme=amethyst]{--bg:#130b1f;--card:rgba(31, 20, 48, 0.62);--accent:#a78bfa;--accent2:#f472b6;--text:#f5f0ff;--hint:#a595c9;--border:rgba(167,139,250,.22);--soft:rgba(167,139,250,.15);--soft2:rgba(244,114,182,.15)}
+:root[data-theme=space]{--bg:#070b16;--card:rgba(15, 23, 48, 0.62);--accent:#818cf8;--accent2:#22d3ee;--text:#eef2ff;--hint:#8e9bc4;--border:rgba(129,140,248,.22);--soft:rgba(129,140,248,.15);--soft2:rgba(34,211,238,.15)}
+:root[data-theme=light]{--bg:#f4f6fb;--card:rgba(255, 255, 255, 0.72);--accent:#2563eb;--accent2:#059669;--text:#111827;--hint:#6b7280;--border:rgba(0,0,0,.12);--soft:rgba(37,99,235,.12);--soft2:rgba(5,150,105,.12)}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;color:var(--text);font:15px/1.35 -apple-system,BlinkMacSystemFont,"SF Pro Display",Roboto,"Segoe UI",sans-serif;
+  background:radial-gradient(120% 50% at 50% -10%,var(--soft),transparent 70%),var(--bg);
+  padding:max(env(safe-area-inset-top),10px) 14px max(env(safe-area-inset-bottom),20px);
+  background-attachment:fixed;background-size:cover;background-position:center}
+button,select,input{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.logo{width:40px;height:40px;flex:none;display:grid;place-items:center;font-size:21px;background:var(--card);border:1px solid var(--border);border-radius:13px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.who{flex:1;min-width:0}.who b{display:block;font-size:17px}
+.who span{display:block;color:var(--hint);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:9px 12px;color:var(--accent);font-weight:700;cursor:pointer;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.week{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:8px;margin-bottom:12px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.week .ib{padding:10px 16px;font-size:18px}
+.wi{flex:1;text-align:center}.wi small{display:block;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}.wi b{font-size:15px}
+.days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:14px}
+.days::-webkit-scrollbar{display:none}
+.day{flex:1 0 62px;text-align:center;padding:10px 4px;background:var(--card);border:1px solid var(--border);border-radius:14px;cursor:pointer;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.day b{display:block;color:var(--accent);font-size:14px}.day i{display:block;font-style:normal;color:var(--hint);font-size:11px;margin:2px 0 5px}
+.day em{font-style:normal;font-size:10px;font-weight:700;color:var(--hint)}
+.day.today{border-color:var(--accent2)}
+.day.on{background:var(--soft);border-color:var(--accent);box-shadow:0 0 14px var(--soft)}
+.les{position:relative;display:flex;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 14px 14px 18px;margin-bottom:10px;overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:all .3s ease}
+.les::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent2)}
+.les.now{border-color:var(--accent2);box-shadow:0 0 22px var(--soft2);transform:scale(1.01)}
+.t{min-width:56px;font-size:15px;font-weight:800;color:var(--accent2)}.t small{display:block;font-size:12px;font-weight:600;color:var(--hint)}
+.b{flex:1;min-width:0}.ti{font-size:15px;font-weight:700;margin-bottom:6px;line-height:1.3;color:var(--text)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px;background:var(--soft);color:var(--accent)}.tag.g{background:var(--soft2);color:var(--accent2)}
+.tr{font-size:13px;color:var(--hint);margin-top:4px;display:flex;align-items:center;gap:4px}
+.empty{text-align:center;padding:38px 16px;color:var(--hint);background:var(--card);border:1px dashed var(--border);border-radius:18px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.dh{margin:0 2px 10px}.dh small{display:block;color:var(--accent2);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}.dh b{font-size:17px}
+.note{margin:0 0 12px;padding:9px 12px;border-radius:12px;background:var(--soft);color:var(--hint);font-size:12px}
+.ib.off{opacity:.45}
+.ib:disabled{opacity:.3;cursor:default}
+.modal{position:fixed;inset:0;z-index:9;display:none;align-items:flex-end;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.modal.open{display:flex}
+.sheet{width:100%;max-height:88vh;overflow-y:auto;background:var(--bg);border-radius:24px 24px 0 0;border-top:1px solid var(--border);padding:18px 16px max(env(safe-area-inset-bottom),28px)}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.mh h2{margin:0;font-size:18px;color:var(--accent)}
+.hint{color:var(--hint);font-size:12px;margin:0 0 14px}
+.fld{margin-bottom:14px}.fld label{display:block;margin-bottom:6px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent)}
+select,input[type=text],input[type=range]{width:100%;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:15px;outline:none;color:inherit}
+.seg{display:flex;gap:6px;padding:4px;background:var(--card);border:1px solid var(--border);border-radius:13px}
+.seg button{flex:1;padding:10px 4px;border:0;border-radius:10px;background:none;color:var(--hint);font-weight:700;cursor:pointer}
+.seg button.on{background:var(--accent);color:var(--bg)}
+.themes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.th{padding:12px 8px;text-align:center;background:var(--card);border:2px solid var(--border);border-radius:14px;font-weight:700;cursor:pointer}
+.th.on{border-color:var(--accent)}
+.status-msg{font-size:12px;color:var(--accent2);margin-top:6px;display:block;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🌿</div>
+  <div class="who"><b>МГЭИ · расписание</b><span id="sub">загрузка…</span></div>
+  <button class="ib" id="today">Сегодня</button>
+  <button class="ib" id="gear" aria-label="Настройки">⚙️</button>
+</header>
+<div class="week">
+  <button class="ib" id="prev" aria-label="Назад">‹</button>
+  <div class="wi"><small id="wl"></small><b id="wd"></b></div>
+  <button class="ib" id="next" aria-label="Вперёд">›</button>
+</div>
+<div class="days" id="days"></div>
+<div class="dh"><small id="dl"></small><b id="dd"></b></div>
+<div class="note" id="note" hidden>ℹ️ В данных нет разбивки по неделям — на любой неделе показано одно и то же расписание</div>
+<div id="list"></div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="mh"><h2>⚙️ Настройки</h2><button class="ib" id="close">✕</button></div>
+    <p class="hint">Сохраняются автоматически</p>
+    <div id="fields"></div>
+    <div class="fld"><label>Подгруппа (лабораторные)</label><div class="seg" id="seg"></div></div>
+    
+    <div class="fld">
+      <label>Фон приложения</label>
+      <div style="display:flex; gap:8px;">
+        <input type="file" id="bgFile" accept="image/*" style="display:none">
+        <button class="ib" id="uploadBtn" style="flex:1; text-align:center; padding:12px;">📁 Загрузить из галереи</button>
+        <button class="ib" id="resetBgBtn" style="padding:12px;" title="Сбросить фон">✕</button>
+      </div>
+      <span class="status-msg" id="bgStatus"></span>
+    </div>
+
+    <div class="fld" id="dimBox">
+      <label>Затемнение фона: <span id="dimVal">60%</span></label>
+      <input type="range" id="dimRange" min="10" max="95" value="60" style="padding:0; height:8px; accent-color:var(--accent);">
+    </div>
+
+    <div class="fld"><label>Тема оформления</label><div class="themes" id="themes"></div></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const tg = window.Telegram && window.Telegram.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  const $ = id => document.getElementById(id);
+  const h = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  };
+  const LS = {
+    get(k, d) { try { return localStorage.getItem(k) || d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+  const cmp = (a, b) => String(a).localeCompare(String(b), "ru", { numeric: true });
+
+  const DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+  const FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+  const THEMES = [["amber", "🔥 Янтарь"], ["emerald", "🌿 Изумруд"], ["ocean", "🌊 Океан"],
+                  ["amethyst", "💎 Аметист"], ["space", "🪐 Космос"], ["light", "☀️ Светлая"]];
+  const TYPES = { 
+    "лаб": ["🧪", "Лаб. работа"], 
+    "лек": ["📖", "Лекция"], 
+    "пр": ["✍️", "Практика"],
+    "практ": ["✍️", "Практика"], 
+    "сем": ["💬", "Семинар"],
+    "конс": ["❓", "Консультация"],
+    "экз": ["📝", "Экзамен"],
+    "зач": ["✅", "Зачёт"]
+  };
+
+  const S = {};
+  ["faculty", "department", "course", "group", "sub", "theme", "bgImage", "bgDim"].forEach(k => {
+    S[k] = LS.get(k, k === "sub" ? "all" : k === "theme" ? "amber" : k === "bgDim" ? "60" : "");
+  });
+
+  let DATA = {}, ALL = [], OPTS = {}, weekOffset = 0;
+  const today = new Date(), todayIdx = (today.getDay() + 6) % 7;
+  let day = todayIdx;
+
+  const save = () => Object.keys(S).forEach(k => LS.set(k, S[k]));
+
+  const LEVELS = [["faculty", "Факультет"], ["department", "Форма обучения"], ["course", "Курс"], ["group", "Группа"]];
+  function cascade() {
+    let pool = ALL;
+    LEVELS.forEach(([k]) => {
+      const opts = [...new Set(pool.map(g => g[k]))].sort(cmp);
+      if (!opts.includes(S[k])) S[k] = opts[0];
+      OPTS[k] = opts;
+      pool = pool.filter(g => g[k] === S[k]);
+    });
+    save();
+  }
+
+  const pad = n => String(n).padStart(2, "0");
+  const keyFor = off => { const d = weekDates(off)[0]; return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+  const hasWeek = off => { const e = DATA[S.group] || {}; return e.weeks ? !!e.weeks[keyFor(off)] : true; };
+  const weekOf = () => { const e = DATA[S.group] || {}; return e.weeks ? e.weeks[keyFor(weekOffset)] : e; };
+
+  function applyTheme() {
+    document.documentElement.dataset.theme = S.theme;
+    if (S.bgImage) {
+      const alpha = (parseInt(S.bgDim || "60", 10) / 100).toFixed(2);
+      document.body.style.background = `linear-gradient(rgba(10, 8, 12, ${alpha}), rgba(10, 8, 12, ${alpha})), url('${S.bgImage}') center/cover no-repeat fixed`;
+    } else {
+      document.body.style.background = "";
+    }
+    try {
+      const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+      if (tg) { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); }
+    } catch (e) {}
+  }
+
+  function parse(l) {
+    let s = (l.subject || "").trim(), sub = null, type = null;
+    
+    const m = s.match(/(\d)\s*п\/гр\.?/i);
+    if (m) { sub = m[1]; s = s.replace(m[0], ""); }
+    
+    const t = s.match(/^(лаб|лек|пр|практ|сем|конс|экз|зач)\b\.?\s*/i);
+    if (t) { 
+      const key = t[1].toLowerCase();
+      type = TYPES[key]; 
+      s = s.slice(t[0].length); 
+    }
+    
+    s = s.replace(/\(\s*\)/g, "").replace(/\s+/g, " ").replace(/^[\s,;.\-–]+|[\s,;.\-–]+$/g, "");
+    
+    return { ...l, title: s || l.subject || "—", sub, type };
+  }
+
+  const lessonsOf = i => ((weekOf() || {})[i] || []).map(parse)
+    .filter(l => !(l.sub && S.sub !== "all" && l.sub !== S.sub));
+
+  const weekDates = off => {
+    const mon = new Date(today.getFullYear(), today.getMonth(), today.getDate() - todayIdx + off * 7);
+    return DAYS.map((_, i) => new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i));
+  };
+  const fmt = d => String(d.getDate()).padStart(2, "0") + "." + String(d.getMonth() + 1).padStart(2, "0");
+  const toMin = t => { const m = (t || "").match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : null; };
+  const roomText = r => /^(ауд|каб)/i.test(r) ? r : "ауд. " + r;
+
+  function isNow(l) {
+    if (weekOffset !== 0 || day !== todayIdx) return false;
+    const [a, b] = (l.time || "").split(/\s*[-–—]\s*/), n = new Date(), cur = n.getHours() * 60 + n.getMinutes();
+    return toMin(a) !== null && toMin(b) !== null && cur >= toMin(a) && cur <= toMin(b);
+  }
+
+  function render() {
+    const maxDays = lessonsOf(6).length ? 7 : 6;
+    if (day >= maxDays) day = 0;
+    const dates = weekDates(weekOffset);
+
+    $("wl").textContent = weekOffset === 0 ? "Текущая неделя" : weekOffset === 1 ? "Следующая неделя"
+      : weekOffset === -1 ? "Прошлая неделя" : weekOffset > 0 ? `Через ${weekOffset} нед.` : `${-weekOffset} нед. назад`;
+    $("wd").textContent = `${fmt(dates[0])} — ${fmt(dates[maxDays - 1])}.${dates[maxDays - 1].getFullYear()}`;
+    $("sub").textContent = [S.group, S.course !== "—" && S.course, S.sub !== "all" && S.sub + " п/гр"].filter(Boolean).join(" · ") || "Выбери группу в ⚙️";
+
+    const days = $("days"); days.replaceChildren();
+    for (let i = 0; i < maxDays; i++) {
+      const c = lessonsOf(i).length;
+      const isRealToday = (weekOffset === 0 && i === todayIdx);
+      const d = h("div", "day" + (i === day ? " on" : "") + (isRealToday ? " today" : ""));
+      d.append(h("b", "", DAYS[i]), h("i", "", fmt(dates[i])), h("em", "", c ? `${c} ${c === 1 ? "пара" : c < 5 ? "пары" : "пар"}` : "—"));
+      d.onclick = () => { day = i; render(); };
+      days.append(d);
+    }
+
+    const picked = dates[day], t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diff = Math.round((picked - t0) / 864e5);
+    $("dl").textContent = diff === 0 ? "Сегодня" : diff === 1 ? "Завтра" : diff === -1 ? "Вчера"
+      : diff > 0 ? `Через ${diff} дн.` : `${-diff} дн. назад`;
+    $("dd").textContent = `${FULL[day]}, ${fmt(picked)}`;
+    $("today").classList.toggle("off", diff === 0);
+    $("note").hidden = weekOffset === 0 || !!(DATA[S.group] || {}).weeks;
+    $("prev").disabled = !hasWeek(weekOffset - 1);
+    $("next").disabled = !hasWeek(weekOffset + 1);
+
+    const list = $("list"); list.replaceChildren();
+    const ls = lessonsOf(day);
+    if (!ls.length) { list.append(h("div", "empty", weekOf() ? "🎉 В этот день занятий нет" : "Нет данных за эту неделю")); return; }
+    
+    ls.forEach(l => {
+      const card = h("div", "les" + (isNow(l) ? " now" : ""));
+      const [a, b] = (l.time || "").split(/\s*[-–—]\s*/);
+      
+      const t = h("div", "t", a || "—"); 
+      if (b) t.append(h("small", "", b));
+      
+      const body = h("div", "b"); 
+      body.append(h("div", "ti", l.title));
+      
+      const tags = h("div", "tags");
+      if (l.type) tags.append(h("span", "tag g", l.type[0] + " " + l.type[1]));
+      if (l.room) tags.append(h("span", "tag", "📍 " + roomText(l.room)));
+      if (l.sub) tags.append(h("span", "tag", `👥 ${l.sub} подгруппа`));
+      if (tags.children.length) body.append(tags);
+      
+      if (l.teacher) body.append(h("div", "tr", "👨‍🏫 " + l.teacher));
+      
+      card.append(t, body); 
+      list.append(card);
+    });
+  }
+
+  function renderSettings() {
+    const box = $("fields"); box.replaceChildren();
+    LEVELS.forEach(([k, label]) => {
+      const o = OPTS[k];
+      if (o.length === 1 && o[0] === "—") return;
+      const f = h("div", "fld"), s = h("select");
+      f.append(h("label", "", label), s);
+      o.forEach(v => s.append(new Option(v, v)));
+      s.value = S[k];
+      s.onchange = () => { S[k] = s.value; cascade(); renderSettings(); render(); };
+      box.append(f);
+    });
+
+    const seg = $("seg"); seg.replaceChildren();
+    [["all", "Все"], ["1", "1 п/гр"], ["2", "2 п/гр"]].forEach(([v, t]) => {
+      const b = h("button", S.sub === v ? "on" : "", t);
+      b.onclick = () => { S.sub = v; save(); renderSettings(); render(); };
+      seg.append(b);
+    });
+
+    const bgStatus = $("bgStatus");
+    bgStatus.textContent = S.bgImage ? "✅ Фоновое изображение установлено" : "";
+
+    const dimBox = $("dimBox");
+    const dimRange = $("dimRange");
+    const dimVal = $("dimVal");
+    
+    dimBox.style.display = S.bgImage ? "block" : "none";
+    dimRange.value = S.bgDim || "60";
+    dimVal.textContent = dimRange.value + "%";
+
+    dimRange.oninput = (e) => {
+      S.bgDim = e.target.value;
+      dimVal.textContent = S.bgDim + "%";
+      save();
+      applyTheme();
+    };
+
+    const fileInput = $("bgFile");
+    $("uploadBtn").onclick = () => fileInput.click();
+    fileInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        S.bgImage = event.target.result;
+        save();
+        applyTheme();
+        bgStatus.textContent = "✅ Фон успешно загружен!";
+        dimBox.style.display = "block";
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+      };
+      reader.readAsDataURL(file);
+    };
+
+    $("resetBgBtn").onclick = () => {
+      S.bgImage = "";
+      save();
+      applyTheme();
+      bgStatus.textContent = "Фон сброшен";
+      dimBox.style.display = "none";
+    };
+
+    const th = $("themes"); th.replaceChildren();
+    THEMES.forEach(([v, t]) => {
+      const b = h("div", "th" + (S.theme === v ? " on" : ""), t);
+      b.onclick = () => { S.theme = v; save(); applyTheme(); renderSettings(); };
+      th.append(b);
+    });
+  }
+
+  // Поддержка свайпов (жестов) для переключения дней недели
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+  document.addEventListener('touchend', e => {
+    const touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 70) {
+      const maxDays = lessonsOf(6).length ? 7 : 6;
+      if (diff < 0 && day < maxDays - 1) { day++; render(); } // свайп влево — следующий день
+      else if (diff > 0 && day > 0) { day--; render(); }       // свайп вправо — предыдущий день
+    }
+  }, {passive: true});
+
+  async function load() {
+    for (const u of ["/api/schedules", "schedules.json"]) {
+      try {
+        const r = await fetch(u, { cache: "no-store" });
+        if (r.ok) {
+          const data = await r.json();
+          LS.set("cached_schedules", JSON.stringify(data));
+          return data;
+        }
+      } catch (e) {}
+    }
+    const cached = LS.get("cached_schedules", null);
+    if (cached) {
+      try { return JSON.parse(cached); } catch (e) {}
+    }
+    return null;
+  }
+
+  async function init() {
+    applyTheme();
+    $("gear").onclick = () => { renderSettings(); $("modal").classList.add("open"); };
+    $("close").onclick = () => $("modal").classList.remove("open");
+    $("modal").onclick = e => { if (e.target.id === "modal") $("modal").classList.remove("open"); };
+    
+    $("prev").onclick = () => { weekOffset--; render(); };
+    $("next").onclick = () => { weekOffset++; render(); };
+    $("today").onclick = () => { weekOffset = 0; day = todayIdx; render(); };
+
+    DATA = await load();
+    if (!DATA || !Object.keys(DATA).length) {
+      $("sub").textContent = "нет данных";
+      $("list").append(h("div", "empty", DATA ? "Расписание пока пустое" : "⚠️ Не удалось загрузить расписание"));
+      return;
+    }
+
+    ALL = Object.entries(DATA).map(([name, e]) => {
+      const m = (e && e._meta) || {};
+      return { faculty: m.faculty || "—", department: m.department || "—", course: m.course || "—", group: name };
+    });
+    cascade();
+
+    if (todayIdx === 6 && !lessonsOf(6).length && hasWeek(1)) { weekOffset = 1; day = 0; }
+    render();
+    setInterval(render, 60000);
+  }
+  init();
+})();
+</script>
+</body>
+</html>
